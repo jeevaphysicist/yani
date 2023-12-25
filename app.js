@@ -19,7 +19,7 @@ const allowedOrigins = ['http://localhost:3000',"https://yanilanka.netlify.app/"
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json({limit:"50mb"}));
-app.use(cors({ origin: allowedOrigins , credentials: true}));
+app.use(cors({ origin: allowedOrigins }));
 
 
 // Database connection 
