@@ -25,7 +25,7 @@ exports.createClientInventory = (req,res)=>{
     ClientInventory.create(data).then(result=>{
         res.status(201).json({message:"Data Client Inventory Created Succesfully"})
  })
- .catch(err=>res.status(500).jons({ error : err , message:"error in database" }));          
+ .catch(err=>res.status(500).json({ error : err , message:"error in database" }));          
 } 
 
 

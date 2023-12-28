@@ -8,7 +8,7 @@ const schema = mongoose.Schema({
                 type:String,
                 required:true
             },
-          Itemcode:{
+          ProductID:{
                 type:String,
                 required:true
             },
@@ -23,6 +23,10 @@ const schema = mongoose.Schema({
           Quantity:{
                 type:Number,
                 required:true
+            },
+          OrderNumber:{
+              type:String,
+              required:true
             },
           CheckNo:{
              type:String,             

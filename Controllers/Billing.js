@@ -5,7 +5,7 @@ exports.createBills = (req,res)=>{
     let data = { 
         Date:req.body.Date,
         GRNRGN:req.body.GRNRGN,
-        Itemcode:req.body.Itemcode,
+        ProductID:req.body.ProductID,
         ProductName:req.body.ProductName,
         Price:req.body.Price,
         Quantity:req.body.Quantity,
@@ -13,10 +13,12 @@ exports.createBills = (req,res)=>{
         BankInDate:req.body.BankInDate,
         CheckAmount:req.body.CheckAmount,
         CheckStatus:"PENDING",
+        OrderNumber:req.body.OrderNumber
       };
+      // console.log("data",data);
 
       // Validate the incoming data
-      if(!data.Date || !data.GRNRGN||!data.Itemcode||!data.ProductName||!data.Price || !data.Quantity){
+      if(!data.Date || !data.GRNRGN||!data.ProductID||!data.ProductName||!data.Price || !data.Quantity || !data.OrderNumber){
         return res.status(400).json({msg:'Please include all fields'});
       }
 
@@ -25,7 +27,7 @@ exports.createBills = (req,res)=>{
          data.CheckStatus = "COMPLETED";
       }
       else{
-         data.CheckStatus = "PENDING_BID";
+         data.CheckStatus = "PENDING";
        }
     }
 
@@ -38,11 +40,41 @@ exports.createBills = (req,res)=>{
 
 // Get  a Billing data
 exports.GetBillingData = (req,res)=>{
-    Billing.find().then(result=>{
+   let filter ={};
+      if(req.params.query === "ALL"){
+          filter={};
+      }
+      if(req.params.query === "COMPLETED")
+         filter.CheckStatus = "COMPLETED"
+      if(req.params.query === "PENDING")
+         filter.CheckStatus = "PENDING"
+
+    Billing.find(filter).then(result=>{
         res.status(201).json({message:"Get  Billing Data Succesfully",data:result})
  })
  .catch(err=>res.status(500).jons({ error : err , message:"error in database" }));          
 } 
+
+exports.updateBilling = async (req,res)=>{
+  let data = req.body ;
+   data.CheckStatus = "PENDING"
+  //  console.log("data",data);
+  if(data.CheckAmount || data.CheckNo || data.BankInDate){      
+    if(data.CheckAmount && data.CheckNo && data.BankInDate){
+       data.CheckStatus = "COMPLETED";
+    }
+    else{
+       data.CheckStatus = "PENDING";
+     }
+  }
+ 
+     Billing.updateOne( { _id:req.body.id } , req.body).then(result=>{
+         res.status(200).json({ message:"Document Update Successfully",data:result })   
+     })
+     .catch(err=>{
+      res.status(500).json({message:"error in database",error:err})
+     })
+}
 
 // Update A Billing Data
 // Create a bill
@@ -101,6 +133,18 @@ exports.updateBillings = async (req, res) => {
     res.status(500).json({ error: err, message: 'Error in database' });
   }
 };
+
+exports.deleteBillings = async (req,res)=>{
+       console.log(req.params.id)
+       Billing.deleteOne({ _id: req.params.id })
+       .then(result => {
+           res.status(200).json({ message: "Delete Product Successfully" });
+       })
+       .catch(err => {
+           res.status(500).json({ message: "Error in database", error: err });
+       });
+
+}
 
 
 
