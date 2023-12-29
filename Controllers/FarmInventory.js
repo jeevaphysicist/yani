@@ -36,5 +36,5 @@ exports.GetFarmInventoryData = (req,res)=>{
     FarmInventory.find().then(result=>{
         res.status(201).json({message:"Get Farm Inventory Data Succesfully",data:result})
  })
- .catch(err=>res.status(500).jons({ error : err , message:"error in database" }));          
+ .catch(err=>res.status(500).json({ error : err , message:"error in database" }));          
 } 
