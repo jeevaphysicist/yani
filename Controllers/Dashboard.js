@@ -2,21 +2,35 @@ const Billings = require('../Models/Billing');
 const BillingInventory = require('../Models/BillInventory');
 
 exports.GetDashBoardData = async (req,res)=>{
+        let filter = {} ;         
+        if(req.body.startDate && req.body.endDate){
+          const startDate = new Date(req.body.startDate);
+          const endDate = new Date(req.body.endDate);
+          const staredDate = startDate.toISOString().split('T')[0];
+          const endedDate = endDate.toISOString().split('T')[0];
+          filter = {
+            Date: {
+              $gte: staredDate,
+              $lte: endedDate,
+            },
+          };
+        }
         console.log("date",req.body);
-        const startDate = new Date('2023-12-17T00:00:00.000Z');
-        const endDate = new Date('2023-12-23T23:59:59.999Z');
-        const targetDate = new Date('2023-12-23T00:00:00.000Z');
+        console.log("filter",filter);
+        
          let data = await Billings.aggregate([
-           
+          {
+            $match: filter
+          },
             {
               $group: {
                 _id: null,
-                totalAmount: { $sum: "$Price" },
+                totalAmount: { $sum: { $multiply: ["$Quantity", "$Price"] } },
                 pendingAmount: {
                   $sum: {
                     $cond: {
                       if: { $eq: ["$CheckStatus", "PENDING"] },
-                      then: "$Price",
+                      then: { $multiply: ["$Quantity", "$Price"] },
                       else: 0
                     }
                   }
@@ -25,7 +39,7 @@ exports.GetDashBoardData = async (req,res)=>{
                   $sum: {
                     $cond: {
                       if: { $eq: ["$CheckStatus", "COMPLETED"] },
-                      then: "$Price",
+                      then: { $multiply: ["$Quantity", "$Price"] },
                       else: 0
                     }
                   }
@@ -66,3 +80,84 @@ exports.GetDashBoardData = async (req,res)=>{
           
          
 }
+
+
+// Updated code to fetch positive and negative quantities along with additional fields for each product
+exports.GetProductQuantities = async (req, res) => {
+  let filter = {} ;         
+        if(req.body.startDate && req.body.endDate){
+          const startDate = new Date(req.body.startDate);
+          const endDate = new Date(req.body.endDate);
+          const staredDate = startDate.toISOString().split('T')[0];
+          const endedDate = endDate.toISOString().split('T')[0];
+          filter = {
+            Date: {
+              $gte: staredDate,
+              $lte: endedDate,
+            },
+          };
+        }
+  try {
+    let data = await Billings.aggregate([
+       {
+        $match: filter
+       },
+       {
+        $group: {
+          _id: "$ProductID",
+          totalPositiveQuantity: {
+            $sum: {
+              $cond: {
+                if: { $gte: ["$Quantity", 0] },
+                then: "$Quantity",
+                else: 0,
+              },
+            },
+          },
+          totalNegativeQuantity: {
+            $sum: {
+              $cond: {
+                if: { $lt: ["$Quantity", 0] },
+                then: "$Quantity",
+                else: 0,
+              },
+            },
+          },
+          // Add additional fields you want to include in the result
+          totalAmount: { $sum: { $multiply: ["$Quantity", "$Price"] } },
+          // Add more fields as needed
+        },
+      },
+      {
+        $lookup: {
+          from: "ProducedInventory",
+          localField: "_id",
+          foreignField: "ProductID",
+          as: "productDetails",
+        },
+      },
+      {
+        $unwind: "$productDetails",
+      },
+      {
+        $project: {
+          _id: 1,
+          ProductName: "$productDetails.ProductName",
+          ProductID: "$productDetails.ProductID",
+          totalPositiveQuantity: 1,
+          totalNegativeQuantity: 1,
+          // Include additional fields in the result
+          totalAmount: 1,
+          // Include more fields as needed
+        },
+      },
+    ]);
+
+    console.log("data", data);
+
+    return res.status(200).send({ data: data });
+  } catch (error) {
+    console.error("Error fetching data:", error);
+    return res.status(500).send({ error: "Internal Server Error" });
+  }
+};

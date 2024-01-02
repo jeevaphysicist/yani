@@ -1,7 +1,7 @@
 const express = require('express');
 
 const router = express.Router();
-const { GetDashBoardData } = require('../Controllers/Dashboard');
+const { GetDashBoardData ,GetProductQuantities} = require('../Controllers/Dashboard');
 
 const { createBills ,GetBillingData, updateBillings, updateBilling, deleteBillings} =require('../Controllers/Billing');
 
@@ -11,6 +11,7 @@ router.post('/update-bills', updateBillings);
 router.post('/update-bill', updateBilling);
 router.delete('/delete-bill/:id', deleteBillings);
 router.post('/dashboard-data', GetDashBoardData);
+router.post('/waste-product', GetProductQuantities);
 
 
 module.exports = router ;

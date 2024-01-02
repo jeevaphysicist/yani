@@ -1,7 +1,20 @@
 const Billing = require('../Models/Billing');
 
+function generateShortId() {
+  const characters = '0123456789';
+  let shortId = '';
+
+  for (let i = 0; i < 5; i++) {
+    const randomIndex = Math.floor(Math.random() * characters.length);
+    shortId += characters.charAt(randomIndex);
+  }
+
+  return shortId;
+}
+
 // Create a bill
 exports.createBills = (req,res)=>{  
+  const uniqueShortId = generateShortId();
     let data = { 
         Date:req.body.Date,
         GRNRGN:req.body.GRNRGN,
@@ -13,13 +26,14 @@ exports.createBills = (req,res)=>{
         BankInDate:req.body.BankInDate,
         CheckAmount:req.body.CheckAmount,
         CheckStatus:"PENDING",
-        OrderNumber:req.body.OrderNumber
+        OrderNumber: uniqueShortId,
+        TotalAmount:req.body.TotalAmount
       };
-      // console.log("data",data);
+      console.log("data",data);
 
       // Validate the incoming data
       if(!data.Date || !data.GRNRGN||!data.ProductID||!data.ProductName||!data.Price || !data.Quantity || !data.OrderNumber){
-        return res.status(400).json({msg:'Please include all fields'});
+        return res.status(400).json({message:'Please include all fields'});
       }
 
       if(data.CheckAmount || data.CheckNo || data.BankInDate){      
@@ -68,8 +82,8 @@ exports.updateBilling = async (req,res)=>{
      }
   }
  
-     Billing.updateOne( { _id:req.body.id } , req.body).then(result=>{
-         res.status(200).json({ message:"Document Update Successfully",data:result })   
+     Billing.updateOne( { _id:req.body.id } , data).then(result=>{
+         res.status(200).json({ message:"Document Update Successfully",data:result ,isSuccess:true })   
      })
      .catch(err=>{
       res.status(500).json({message:"error in database",error:err})
@@ -83,7 +97,7 @@ exports.updateBillings = async (req, res) => {
    console.log("bills",req.body.bills);
   // Validate the incoming data
   if (!billsToUpdate || !Array.isArray(billsToUpdate) || billsToUpdate.length === 0) {
-    return res.status(400).json({ msg: 'Please provide an array of bills to update' });
+    return res.status(400).json({ message: 'Please provide an Note to update' });
   }
 
   const updatePromises = billsToUpdate.map(async (bill) => {
@@ -138,7 +152,7 @@ exports.deleteBillings = async (req,res)=>{
        console.log(req.params.id)
        Billing.deleteOne({ _id: req.params.id })
        .then(result => {
-           res.status(200).json({ message: "Delete Product Successfully" });
+           res.status(200).json({ message: "Delete Product Successfully" ,isSuccess:true});
        })
        .catch(err => {
            res.status(500).json({ message: "Error in database", error: err });

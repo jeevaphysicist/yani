@@ -34,7 +34,7 @@ const schema = mongoose.Schema({
           BankInDate:{
             type:String,
         },
-        CheckAmount:{
+        CheckAmount:{ 
             type:Number,
         },
         CheckStatus:{
@@ -42,6 +42,10 @@ const schema = mongoose.Schema({
             default:"PENDING",
             enum:["PENDING","PENDING_BID","COMPLETED"]
         },
+        TotalAmount:{
+          type:Number,
+          required:true
+        }
 
 });
 
