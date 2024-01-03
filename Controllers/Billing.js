@@ -94,7 +94,8 @@ exports.updateBilling = async (req,res)=>{
 // Create a bill
 exports.updateBillings = async (req, res) => {
   const billsToUpdate = req.body.bills; // Assuming the bills array is in req.body
-   console.log("bills",req.body.bills);
+  // console.log("bills", req.body.bills);
+
   // Validate the incoming data
   if (!billsToUpdate || !Array.isArray(billsToUpdate) || billsToUpdate.length === 0) {
     return res.status(400).json({ message: 'Please provide an Note to update' });
@@ -102,20 +103,15 @@ exports.updateBillings = async (req, res) => {
 
   const updatePromises = billsToUpdate.map(async (bill) => {
     const filter = {
-      Date: bill.Date,
-      GRNRGN: bill.GRNRGN,
-      Itemcode: bill.Itemcode,
-      ProductName: bill.ProductName,
-      Price: bill.Price,
-      Quantity: bill.Quantity,
-      // Add more conditions as needed
+      _id: bill._id
     };
+   
 
     const update = {
       $set: {
         Date: bill.Date,
         GRNRGN: bill.GRNRGN,
-        Itemcode: bill.Itemcode,
+        ProductID: bill.ProductID, // Corrected field name based on the schema
         ProductName: bill.ProductName,
         Price: bill.Price,
         Quantity: bill.Quantity,
@@ -129,7 +125,7 @@ exports.updateBillings = async (req, res) => {
       if (update.$set.CheckAmount && update.$set.CheckNo && update.$set.BankInDate) {
         update.$set.CheckStatus = 'COMPLETED';
       } else {
-        update.$set.CheckStatus = 'PENDING_BID';
+        update.$set.CheckStatus = 'PENDING';
       }
     }
 
