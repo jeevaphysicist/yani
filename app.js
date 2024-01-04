@@ -52,7 +52,7 @@ app.use('/api/Producedinventory',ProducedInventoryRoutes);
 // Client Inventory Routes
 app.use('/api/clientinventory',ClientInventoryRoutes);
 // Billing Routes
-app.use('/api/billing',Billing);      
+app.use('/api/billing',Billing);       
 // User Farm Inventory Routes
 app.use('/api/userfarminventory',UserFarmInventoryRoutes);
 // User Produced Inventory Routes

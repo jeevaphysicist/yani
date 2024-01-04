@@ -25,7 +25,7 @@ exports.createUserFarmInventory = async (req, res) => {
 
       UserFarmInventory.create(data)
         .then((result) => {
-          res.status(201).json({ message: 'Data Farm Inventory Created Successfully' });
+          res.status(201).json({ message: 'Data Farm Inventory Created Successfully' , isSuccess:true });
         })
         .catch((err) => {
           res.status(500).json({ error: err, message: 'Error in database' });
@@ -37,7 +37,7 @@ exports.createUserFarmInventory = async (req, res) => {
       // Save the updated product
       await product.save();
 
-      return res.status(200).json({ message: 'Quantity updated successfully' });
+      return res.status(200).json({ message: 'Quantity updated successfully' , isSuccess:true });
     }
   } catch (err) {
     // Handle any unexpected errors
@@ -69,7 +69,7 @@ exports.UpdateUserFarmINventory = async (req,res)=>{
       if (updatedQuantity >= 0) {
         // Update the quantity in the database
         await UserFarmInventory.updateOne({ _id : id}, { $set: { Quantity: updatedQuantity } });
-        res.status(200).json({ message: `Updated quantity  ${updatedQuantity}` });
+        res.status(200).json({ message: `Updated quantity  ${updatedQuantity}` , isSuccess:true });
       } else {
         res.status(400).json({ error: `Not enough quantity available` });
       }

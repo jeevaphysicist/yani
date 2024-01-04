@@ -25,7 +25,7 @@ const BillingInventory = require('../Models/BillInventory');
   
         UserProducedInventory.create(data)
           .then((result) => {
-            res.status(201).json({ message: 'Data Farm Inventory Created Successfully' });
+            res.status(201).json({ message: 'Data Farm Inventory Created Successfully' , isSuccess:true });
           })
           .catch((err) => {
             res.status(500).json({ error: err, message: 'Error in database' });
@@ -37,7 +37,7 @@ const BillingInventory = require('../Models/BillInventory');
         // Save the updated product
         await product.save();
   
-        return res.status(200).json({ message: 'Quantity updated successfully' });
+        return res.status(200).json({ message: 'Quantity updated successfully' , isSuccess:true });
       }
     } catch (err) {
       // Handle any unexpected errors
@@ -57,7 +57,7 @@ exports.GetUserProducedInventoryData = (req,res)=>{
 
 // Update a Quantity
 exports.UpdateUserProducedInventoryData = async (req, res) => {
-  //  console.log("req.body",req.body.Products);
+  //  console.log("req.body",req.body);
   try {
     let insufficientQuantity = false; // Flag to track if any item has insufficient quantity
     for (const buyItem of req.body.Products) {      

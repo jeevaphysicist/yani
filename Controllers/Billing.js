@@ -29,7 +29,7 @@ exports.createBills = (req,res)=>{
         OrderNumber: uniqueShortId,
         TotalAmount:req.body.TotalAmount
       };
-      console.log("data",data);
+      // console.log("data",data); 
 
       // Validate the incoming data
       if(!data.Date || !data.GRNRGN||!data.ProductID||!data.ProductName||!data.Price || !data.Quantity || !data.OrderNumber){
