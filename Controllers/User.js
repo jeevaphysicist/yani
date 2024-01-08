@@ -7,6 +7,9 @@ const jwt = require('jsonwebtoken');
 exports.signup = async(req,res)=>{
   // console.log("data",req.body);
             let { Email,Password,UserName,Role } = req.body;
+            if(!Password || !Email || !UserName || !Role ){
+              return res.status(400).json({ message:"Please fill the fields" , isSuccess:false })
+        }
             let filter = {Email:Email};
             const salt = bcrypt.genSaltSync(10);
             const hash = bcrypt.hashSync(Password , salt);
@@ -21,14 +24,14 @@ exports.signup = async(req,res)=>{
                     };
         // console.log("process.env.email",process.env.email);
                Usercollection.create(data).then(result=>{           
-                res.status(201).json({ message:"SignUp Successfully",signup:true })
+                res.status(201).json({ message:"SignUp Successfully",isSuccess:true })
                })
                .catch(err=>{
-                     res.status(505).json({ message:"Error in database", Error:err , signup:false})
+                     res.status(505).json({ message:"Error in database", Error:err , isSuccess:false})
                     })
             }
             else{
-                res.status(200).json({ message:"User Already Exist Please Continue Login", signup:false})
+                res.status(200).json({ message:"User Already Exist Please Continue Login", isSuccess:false})
             }
 }
 
@@ -62,4 +65,61 @@ exports.login = async(req,res)=>{
        res.status(505).json({ message:"Error in Database" ,login:false ,error:error  })
      })
     }
+}
+
+exports.UpdateUser = async(req,res)=>{
+  console.log("data",req.body);
+            let { Email, Password , UserName ,Role, id} = req.body;
+            // console.log("!Password && !Email && !UserName && !Role && !id",)
+            if(!Password || !Email || !UserName || !Role || !id){
+              return res.status(400).json({ message:"Please fill the fields" , isSuccess:false })
+             }
+            let filter = {Email:Email};
+            let count = await Usercollection.find(filter).count();
+            
+            const salt = bcrypt.genSaltSync(10);
+            const hash = bcrypt.hashSync(Password , salt);
+                  Password = hash ;
+            
+            if(count === 1){ 
+                let data={
+                       UserName:UserName,
+                       Email,
+                       Password,
+                       Role
+                    };
+        // console.log("process.env.email",process.env.email);
+               Usercollection.updateOne({_id:id},data).then(result=>{           
+                res.status(201).json({ message:"User Data Update Successfully",isSuccess:true })
+               })
+               .catch(err=>{
+                     res.status(505).json({ message:"Error in database", Error:err , isSuccess:false})
+                    })
+            }
+            else{
+                res.status(200).json({ message:"User Not Exist ", isSuccess:false})
+            }
+}
+
+// GET USER
+exports.getallusers = async(req,res)=>{
+  let filter = {};
+   if(req.params.query === "All"){
+      filter = {};
+   }
+   if(req.params.query === "Admin"){
+     filter = {Role:"Admin"};
+  }
+  if(req.params.query === "User"){
+     filter = {Role:"User"};
+  }
+
+  let count = await Usercollection.find().count();
+   Usercollection.find(filter,{Password:0})
+   .then(result=>{ 
+           res.status(200).json({ data: result ,TotalUser:count });     
+   })
+   .catch(error=>{
+     res.status(505).json({ message:"Error in Database"  ,error:error  })
+   })
 }
