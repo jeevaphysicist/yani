@@ -43,7 +43,7 @@ exports.GetFarmInventoryData = (req,res)=>{
 
 exports.updateFarmInventory = async (req,res)=>{      
        //   console.log("req.body",req.body);
-         if(!req.body.ProductName || !req.body.QuantityType ||!req.body.id )
+         if(!req.body.ProductName || !req.body.QuantityType ||!req.body.id ||!req.body.ProductID )
           return res.status(404).json({message:"Something went wrong"});
           FarmInventory.updateOne( { _id:req.body.id } , req.body).then(result=>{
               res.status(200).json({ message:"Document Update Successfully",data:result ,isSuccess:true })   
