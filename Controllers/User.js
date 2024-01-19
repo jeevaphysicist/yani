@@ -67,27 +67,31 @@ exports.login = async(req,res)=>{
     }
 }
 
-exports.UpdateUser = async(req,res)=>{
+exports.UpdateUser = async (req,res)=>{
   console.log("data",req.body);
+  let data = {};
             let { Email, Password , UserName ,Role, id} = req.body;
             // console.log("!Password && !Email && !UserName && !Role && !id",)
-            if(!Password || !Email || !UserName || !Role || !id){
+            if( !Email || !UserName || !Role || !id ){
               return res.status(400).json({ message:"Please fill the fields" , isSuccess:false })
+             }
+             else{
+                data.UserName = UserName;
+                data.Role = Role;
+                data.Email = Email;
+             }
+             if(Password){
+              const salt = await bcrypt.genSaltSync(10);
+              const hash = await bcrypt.hashSync(Password , salt);
+                    data.Password = hash ;
              }
             let filter = {Email:Email};
             let count = await Usercollection.find(filter).count();
             
-            const salt = bcrypt.genSaltSync(10);
-            const hash = bcrypt.hashSync(Password , salt);
-                  Password = hash ;
+            
             
             if(count === 1){ 
-                let data={
-                       UserName:UserName,
-                       Email,
-                       Password,
-                       Role
-                    };
+               
         // console.log("process.env.email",process.env.email);
                Usercollection.updateOne({_id:id},data).then(result=>{           
                 res.status(201).json({ message:"User Data Update Successfully",isSuccess:true })
