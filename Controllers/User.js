@@ -85,7 +85,7 @@ exports.UpdateUser = async (req,res)=>{
               const hash = await bcrypt.hashSync(Password , salt);
                     data.Password = hash ;
              }
-            let filter = {_id:id};
+            let filter = {Email:Email};
             let count = await Usercollection.find(filter).count();
             
             
@@ -103,6 +103,22 @@ exports.UpdateUser = async (req,res)=>{
             else{
                 res.status(200).json({ message:"User Not Exist ", isSuccess:false})
             }
+}
+
+exports.deleteUser= async(req,res)=>{
+    Usercollection.deleteOne({_id:id}).then(response=>{
+      res.status(505).json({
+        message:"User Deleted Successfully",
+        isSuccess:true
+     })     
+    })
+    .catch(err=>{
+         res.status(505).json({
+            message:"Internal Server Error",
+            error:err,
+            isSuccess:false
+         })
+    })
 }
 
 // GET USER
