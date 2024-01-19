@@ -85,7 +85,7 @@ exports.UpdateUser = async (req,res)=>{
               const hash = await bcrypt.hashSync(Password , salt);
                     data.Password = hash ;
              }
-            let filter = {Email:Email};
+            let filter = {_id:id};
             let count = await Usercollection.find(filter).count();
             
             
