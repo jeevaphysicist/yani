@@ -105,20 +105,16 @@ exports.UpdateUser = async (req,res)=>{
             }
 }
 
-exports.deleteUser= async(req,res)=>{
-    Usercollection.deleteOne({_id:id}).then(response=>{
-      res.status(505).json({
-        message:"User Deleted Successfully",
-        isSuccess:true
-     })     
-    })
-    .catch(err=>{
-         res.status(505).json({
-            message:"Internal Server Error",
-            error:err,
-            isSuccess:false
-         })
-    })
+exports.deleteUser = async (req,res)=>{
+  console.log(req.params.id)
+  Usercollection.deleteOne({ _id: req.params.id })
+  .then(result => {
+      res.status(200).json({ message: "Delete Product Successfully" ,isSuccess:true});
+  })
+  .catch(err => {
+      res.status(500).json({ message: "Error in database", error: err ,isSuccess:false});
+  });
+
 }
 
 // GET USER
