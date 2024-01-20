@@ -1,4 +1,5 @@
 const ProducedInventory = require('../Models/ProducedInventory');
+const UserProducedInventry = require('../Models/UserProducedInventry');
 
 // Function to generate a random alphanumeric string with 4 digits
 function generateShortId() {
@@ -32,11 +33,34 @@ exports.createProducedInventory = (req,res)=>{
 
 
 // Get  a Produced Inventory
-exports.GetProducedInventoryData = (req,res)=>{
-    ProducedInventory.find().then(result=>{
-        res.status(201).json({message:"Get  Produced Inventory Data Succesfully",data:result ,isSuccess:true})
- })
- .catch(err=>res.status(500).jons({ error : err , message:"error in database" }));          
+exports.GetProducedInventoryData = async (req,res)=>{
+  try {
+    const producedInventoryProducts = await ProducedInventory.find();
+     let result = [];
+    for (const producedProduct of producedInventoryProducts) {
+        const userInventoryEntries = await UserProducedInventry.find({ ProductID: producedProduct.ProductID });
+        const totalQuantity = userInventoryEntries.reduce((total, entry) => total + entry.Quantity, 0);
+    
+        let data = {
+           _id:producedProduct._id,
+           ProductID:producedProduct.ProductID,
+           ProductName:producedProduct.ProductName,
+           QuantityType:producedProduct.QuantityType,
+           TotalQuantity:totalQuantity
+        };
+        result.push(data);                
+    }
+    res.status(200).json({
+           message:"Get Produced data Successfully ",
+           data:result
+       })
+
+} catch (error) {
+  res.status(500).json({
+      message:"Internal Server Error",
+      error
+  })
+}
 } 
 
 exports.updateProducedInventory = async (req,res)=>{      
@@ -48,5 +72,17 @@ exports.updateProducedInventory = async (req,res)=>{
   .catch(err=>{
    res.status(500).json({message:"error in database",error:err})
   })
+}
+
+exports.deleteproduct = async (req,res)=>{
+  console.log(req.params.id)
+  ProducedInventory.deleteOne({ _id: req.params.id })
+  .then(result => {
+      res.status(200).json({ message: "Delete Product Successfully" ,isSuccess:true});
+  })
+  .catch(err => {
+      res.status(500).json({ message: "Error in database", error: err ,isSuccess:false});
+  });
+
 }
 

@@ -8,7 +8,7 @@ const BillingInventory = require('../Models/BillInventory');
       const quantity = parseInt(req.body.Quantity, 10);
   
       // Find the product in the database based on ProductID
-      let product = await UserProducedInventory.findOne({ ProductID: req.body.ProductID });
+      let product = await UserProducedInventory.findOne({ ProductID: req.body.ProductID , UserID:req.body.UserID });
   
       // console.log('product', product);
   

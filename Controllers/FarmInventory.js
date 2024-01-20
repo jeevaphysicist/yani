@@ -1,4 +1,5 @@
 const FarmInventory = require('../Models/FarmInventory');
+const UserFarmInventory = require('../Models/UserFarmInventry');
 
 // Function to generate a random alphanumeric string with 4 digits
 function generateShortId() {
@@ -34,11 +35,34 @@ exports.createFarmInventory = (req,res)=>{
 
 
 // Get  a Farm Inventory Data
-exports.GetFarmInventoryData = (req,res)=>{
-    FarmInventory.find().then(result=>{
-        res.status(201).json({message:"Get Farm Inventory Data Succesfully",data:result ,isSuccess:true})
- })
- .catch(err=>res.status(500).json({ error : err , message:"error in database" }));          
+exports.GetFarmInventoryData = async (req,res)=>{
+       try {
+              const farmInventoryProducts = await FarmInventory.find();
+               let result = [];
+              for (const farmProduct of farmInventoryProducts) {
+                  const userInventoryEntries = await UserFarmInventory.find({ ProductID: farmProduct.ProductID });
+                  const totalQuantity = userInventoryEntries.reduce((total, entry) => total + entry.Quantity, 0);
+              
+                  let data = {
+                     _id:farmProduct._id,
+                     ProductID:farmProduct.ProductID,
+                     ProductName:farmProduct.ProductName,
+                     QuantityType:farmProduct.QuantityType,
+                     TotalQuantity:totalQuantity
+                  };
+                  result.push(data);                
+              }
+              res.status(200).json({
+                     message:"Get Farm data Successfully ",
+                     data:result
+                 })
+      
+          } catch (error) {
+              res.status(500).json({
+                     message:"Internal Server Error",
+                     error
+                 })
+          }
 } 
 
 exports.updateFarmInventory = async (req,res)=>{      
@@ -51,4 +75,16 @@ exports.updateFarmInventory = async (req,res)=>{
           .catch(err=>{
            res.status(500).json({message:"error in database",error:err})
           })
+     }
+
+exports.deleteproduct = async (req,res)=>{
+       console.log(req.params.id)
+       FarmInventory.deleteOne({ _id: req.params.id })
+       .then(result => {
+           res.status(200).json({ message: "Delete Product Successfully" ,isSuccess:true});
+       })
+       .catch(err => {
+           res.status(500).json({ message: "Error in database", error: err ,isSuccess:false});
+       });
+     
      }
