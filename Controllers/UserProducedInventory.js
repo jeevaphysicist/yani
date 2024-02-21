@@ -102,3 +102,18 @@ exports.UpdateUserProducedInventoryData = async (req, res) => {
 
 }
 
+exports.GetAllDispatchForAdmin = (req,res)=>{
+    BillingInventory.find().then((result)=>{
+         res.status(200).json({
+             message:"Get All Dispatch For Admin",
+             data:result
+         })
+    })
+    .catch(err=>{
+          res.status(500).json({
+              error:err,
+              message:"error in database"
+          })
+    })
+}
+

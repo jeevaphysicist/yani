@@ -1,5 +1,6 @@
 const Billings = require('../Models/Billing');
-const BillingInventory = require('../Models/BillInventory');
+const BillInventory = require('../Models/BillInventory');
+const ProducedInventory = require('../Models/ProducedInventory');
 
 exports.GetDashBoardData = async (req,res)=>{
         let filter = {} ;         
@@ -161,3 +162,64 @@ exports.GetProductQuantities = async (req, res) => {
     return res.status(500).send({ error: "Internal Server Error" });
   }
 };
+
+
+
+exports.getmissingproductquantities = async (req, res) => {
+  try {
+    const billInventoryResults = await BillInventory.aggregate([
+      { $unwind: "$ProductDetails" },
+      { 
+        $group: {
+          _id: "$ProductDetails.ProductID",
+          totalQuantity: { $sum: "$ProductDetails.Quantity" }
+        }
+      }
+    ]);
+
+    const billingResults = await Billings.aggregate([
+      { 
+        $group: {
+          _id: "$ProductID",
+          totalQuantity: { $sum: { $cond: { if: { $gte: ["$Quantity", 0] }, then: "$Quantity", else: 0 } } }
+        }
+      }
+    ]);
+
+    const missingQuantities = await ProducedInventory.aggregate([
+      {
+        $lookup: {
+          from: "ProducedInventory",
+          localField: "ProductID",
+          foreignField: "ProductID",
+          as: "product"
+        }
+      },
+      {
+        $unwind: "$product"
+      },
+      {
+        $project: {
+          ProductID: "$ProductID",
+          ProductName: "$product.ProductName",
+          Quantity: "$Quantity"
+        }
+      }
+    ]);
+
+    const result = missingQuantities.map(product => {
+      const billingQuantity = billingResults.find(item => item._id === product.ProductID)?.totalQuantity || 0;
+      const inventoryQuantity = billInventoryResults.find(item => item._id === product.ProductID)?.totalQuantity || 0;
+      const availableQuantity = product.Quantity;
+      const missingQuantity = inventoryQuantity-billingQuantity;
+      let TotalQuantity = inventoryQuantity ;
+      return { ProductID: product.ProductID, ProductName: product.ProductName, TotalQuantity , missingQuantity };
+    });
+
+    res.json(result);
+  } catch (error) {
+    console.error('Error calculating missing product quantities:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+};
+

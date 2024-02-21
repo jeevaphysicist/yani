@@ -45,6 +45,9 @@ const schema = mongoose.Schema({
         TotalAmount:{
           type:Number,
           required:true
+        },
+        PurchaseNo:{
+           type:String
         }
 
 });

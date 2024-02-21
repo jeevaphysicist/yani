@@ -118,6 +118,7 @@ exports.updateBillings = async (req, res) => {
         CheckNo: bill.CheckNo,
         BankInDate: bill.BankInDate,
         CheckAmount: bill.CheckAmount,
+        PurchaseNo:bill.PurchaseNo
       },
     };
 
