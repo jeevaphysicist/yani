@@ -43,12 +43,12 @@ const schema = mongoose.Schema({
             enum:["PENDING","PENDING_BID","COMPLETED"]
         },
         TotalAmount:{
-          type:Number,
+          type:Number, 
           required:true
         },
         PurchaseNo:{
            type:String
-        }
+        } 
 
 });
 

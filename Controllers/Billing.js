@@ -157,5 +157,39 @@ exports.deleteBillings = async (req,res)=>{
 
 }
 
+exports.BillingCheckAmount = async (req, res) => {
+  try {
+      const pipeline = [
+        {
+          $facet: {
+            "totalCheckAmount": [
+              {
+                $match: {
+                  BankInDate: { $exists: true, $ne: "" }
+                }
+              },
+              {
+                $group: {
+                  _id: null,
+                  totalCheckAmount: { $sum: "$TotalAmount" }
+                }
+              }
+            ],
+            
+          }
+        }
+      ]
+
+      const result = await Billing.aggregate(pipeline);
+      console.log("result",result);
+
+      // Send the total check amount as a response
+      res.status(200).json({ totalCheckAmount: result[0].totalCheckAmount });
+  } catch (error) {
+      // Handle any errors and send an error response
+      console.error('Error calculating total check amount:', error);
+      res.status(500).json({ error: 'An error occurred while calculating total check amount' });
+  }
+};
 
 

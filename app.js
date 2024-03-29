@@ -3,7 +3,7 @@ const cors = require('cors');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 require('dotenv').config();
-
+     
 // Import Routes
 const AuthRoutes = require('./routes/User'); 
 const FarmInventoryRoutes = require('./routes/FarmInventory');
@@ -13,15 +13,15 @@ const UserProducedInventoryRoutes = require('./routes/UserProducedInventory');
 const ClientInventoryRoutes = require('./routes/ClientInvetory');
 const Billing = require('./routes/Billing');   
     
-const app = express(); 
+const app = express();     
 const PORT = process.env.PORT || 8080 ;
 const allowedOrigins = ['http://localhost:3000',"https://yanilanka.netlify.app",'https://inventory-h9o9.onrender.com',"https://yanilanka1.netlify.app"];
-
+ 
 app.use(bodyParser.urlencoded({ extended: false }));
-app.use(bodyParser.json({limit:"50mb"}));
+app.use(bodyParser.json({limit:"50mb"})); 
 app.use(cors({ origin: allowedOrigins }));
-    
-
+      
+ 
 // Database connection 
 mongoose.connect(process.env.MONGOURI);
 
