@@ -3,7 +3,7 @@ const cors = require('cors');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 require('dotenv').config();
-   
+    
 // Import Routes
 const AuthRoutes = require('./routes/User'); 
 const FarmInventoryRoutes = require('./routes/FarmInventory');

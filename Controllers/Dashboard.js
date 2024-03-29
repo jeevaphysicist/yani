@@ -16,8 +16,8 @@ exports.GetDashBoardData = async (req,res)=>{
             },
           };
         }
-        console.log("date",req.body);
-        console.log("filter",filter);
+        // console.log("date",req.body);
+        // console.log("filter",filter);
         
          let data = await Billings.aggregate([
           {
