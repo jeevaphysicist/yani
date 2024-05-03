@@ -55,8 +55,7 @@ exports.GetFarmInventoryData = async (req,res)=>{
               res.status(200).json({
                      message:"Get Farm data Successfully ",
                      data:result
-                 })
-      
+                     })
           } catch (error) {
               res.status(500).json({
                      message:"Internal Server Error",

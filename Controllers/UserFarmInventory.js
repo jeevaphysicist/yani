@@ -78,7 +78,7 @@ exports.UpdateUserFarmINventory = async (req,res)=>{
     }
 }
 catch (error) {
-    console.error('Error updating quantity:', error);
+    // console.error('Error updating quantity:', error);
     res.status(500).json({ error: 'Internal server error' });
   } 
 }

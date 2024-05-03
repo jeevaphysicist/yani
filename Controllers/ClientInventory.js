@@ -50,7 +50,7 @@ exports.GetClientInventoryData = (req,res)=>{
 } 
 
 exports.deleteClient = async (req,res)=>{
-  console.log(req.params.id)
+  // console.log(req.params.id)
   ClientInventory.deleteOne({ _id: req.params.id })
   .then(result => {
       res.status(200).json({ message: "Delete Client Successfully" ,isSuccess:true});

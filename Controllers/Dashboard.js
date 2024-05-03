@@ -154,7 +154,7 @@ exports.GetProductQuantities = async (req, res) => {
       },
     ]);
 
-    console.log("data", data);
+    // console.log("data", data);
 
     return res.status(200).send({ data: data });
   } catch (error) {
@@ -218,7 +218,7 @@ exports.getmissingproductquantities = async (req, res) => {
 
     res.json(result);
   } catch (error) {
-    console.error('Error calculating missing product quantities:', error);
+    // console.error('Error calculating missing product quantities:', error);
     res.status(500).json({ error: 'Internal Server Error' });
   }
 };

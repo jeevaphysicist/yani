@@ -3,53 +3,52 @@ const schema = mongoose.Schema({
           Date:{
                    type:String,
                    required:true
-            },
+          },
           GRNRGN:{
                 type:String,
                 required:true
-            },
+          },
           ProductID:{
                 type:String,
                 required:true
-            },
+          },
           ProductName:{
                 type:String,
                 required:true
-            },
+          },
           Price:{
                 type:Number,
                 required:true
-            },
+          },
           Quantity:{
                 type:Number,
                 required:true
-            },
+          },
           OrderNumber:{
               type:String,
               required:true
-            },
-          CheckNo:{
+          },
+           CheckNo:{
              type:String,             
           },
-          BankInDate:{
+           BankInDate:{
             type:String,
-        },
-        CheckAmount:{ 
+          },
+           CheckAmount:{ 
             type:Number,
-        },
-        CheckStatus:{
+          },
+           CheckStatus:{
             type:String,
             default:"PENDING",
             enum:["PENDING","PENDING_BID","COMPLETED"]
-        },
-        TotalAmount:{
+          },
+           TotalAmount:{
           type:Number, 
           required:true
-        },
-        PurchaseNo:{
+          },
+           PurchaseNo:{
            type:String
-        } 
-
+          } 
 });
 
 module.exports =  mongoose.model("Billing",schema,"Billing")

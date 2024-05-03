@@ -181,13 +181,13 @@ exports.BillingCheckAmount = async (req, res) => {
       ]
 
       const result = await Billing.aggregate(pipeline);
-      console.log("result",result);
+      // console.log("result",result);
 
       // Send the total check amount as a response
       res.status(200).json({ totalCheckAmount: result[0].totalCheckAmount });
   } catch (error) {
       // Handle any errors and send an error response
-      console.error('Error calculating total check amount:', error);
+      // console.error('Error calculating total check amount:', error);
       res.status(500).json({ error: 'An error occurred while calculating total check amount' });
   }
 };

@@ -60,7 +60,7 @@ exports.GetUserProducedInventoryData = (req,res)=>{
  
 
 const SendEmail = (data)=>{
-  console.log("data",data);
+  // console.log("data",data);
 
     let mailOptions = {
         from: process.env.email,
@@ -82,13 +82,13 @@ const SendEmail = (data)=>{
       });
 
       transporter.sendMail(mailOptions, function(error, info) {
-        console.log("error",error);
+        // console.log("error",error);
         if (error) {
           return false
         } 
       }); 
 
-      console.log("info",info) 
+      // console.log("info",info) 
     }
 
 
@@ -206,5 +206,21 @@ exports.GetAllDispatchForAdmin = (req,res)=>{
               message:"error in database"
           })
     })
+}
+
+exports.DeleteDispatchForAdmin = (req,res)=>{
+  // console.log("req",req.body);
+  BillingInventory.deleteOne({ _id : req.body.id }).then((result)=>{
+       res.status(200).json({
+           message:"Dispact Bill Delete Successfully",
+           data:result 
+       })
+  })
+  .catch(err=>{
+        res.status(500).json({
+            error:err,
+            message:"error in database"
+        })
+  })
 }
 
