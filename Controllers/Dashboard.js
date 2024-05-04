@@ -145,6 +145,7 @@ exports.GetProductQuantities = async (req, res) => {
           _id: 1,
           ProductName: "$productDetails.ProductName",
           ProductID: "$productDetails.ProductID",
+          Unit: "$productDetails.QuantityType",
           totalPositiveQuantity: 1,
           totalNegativeQuantity: 1,
           // Include additional fields in the result
@@ -202,18 +203,22 @@ exports.getmissingproductquantities = async (req, res) => {
         $project: {
           ProductID: "$ProductID",
           ProductName: "$product.ProductName",
-          Quantity: "$Quantity"
+          Quantity: "$Quantity",
+          Unit:"product.QuantityType"
         }
       }
     ]);
 
     const result = missingQuantities.map(product => {
+
+      console.log("product",product);
+
       const billingQuantity = billingResults.find(item => item._id === product.ProductID)?.totalQuantity || 0;
       const inventoryQuantity = billInventoryResults.find(item => item._id === product.ProductID)?.totalQuantity || 0;
       const availableQuantity = product.Quantity;
       const missingQuantity = inventoryQuantity-billingQuantity;
       let TotalQuantity = inventoryQuantity ;
-      return { ProductID: product.ProductID, ProductName: product.ProductName, TotalQuantity , missingQuantity };
+      return { ProductID: product.ProductID, ProductName: product.ProductName, Unit:product.Unit ,TotalQuantity , missingQuantity };
     });
 
     res.json(result);
@@ -266,6 +271,7 @@ exports.GetMissingQuantityForDispatch =async (req,res)=>{
                     BillingQuantity: "$Quantity",
                     PricePerUnit: "$Price",
                     InventoryQuantity: "$billInventoryData.ProductDetails.Quantity",
+                    Unit:"$billInventoryData.ProductDetails.QuantityType",
                     MissingQuantity: { $subtract: ["$Quantity", "$billInventoryData.ProductDetails.Quantity"] }
                 }
             }
