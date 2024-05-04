@@ -223,3 +223,59 @@ exports.getmissingproductquantities = async (req, res) => {
   }
 };
 
+
+exports.GetMissingQuantityForDispatch =async (req,res)=>{
+  let filter = {Quantity: { $gt: 0 }} ;         
+        if(req.body.startDate && req.body.endDate){
+          const startDate = new Date(req.body.startDate);
+          const endDate = new Date(req.body.endDate);
+          const staredDate = startDate.toISOString().split('T')[0];
+          const endedDate = endDate.toISOString().split('T')[0];
+          filter = {
+            Date: {
+              $gte: staredDate,
+              $lte: endedDate,
+            },
+          };
+        }
+
+    try {
+        // Aggregate the data
+        const result = await Billings.aggregate([
+            {
+            $match: filter // Filter documents where Quantity is greater than 0
+            },
+            {
+                $lookup: {
+                    from: "BillInventory", // Collection to join
+                    localField: "PurchaseNo", // Field from Billing
+                    foreignField: "BillNo", // Field from BillInventory
+                    as: "billInventoryData" // Alias for the joined data
+                }
+            },
+            {
+                $unwind: "$billInventoryData" // Deconstruct the array
+            },
+            {
+                $unwind: "$billInventoryData.ProductDetails" // Deconstruct the array within billInventoryData
+            },
+            {
+                $project: {
+                    PurchaseNo: 1,
+                    ProductName: "$billInventoryData.ProductDetails.ProductName",
+                    BillingQuantity: "$Quantity",
+                    PricePerUnit: "$Price",
+                    InventoryQuantity: "$billInventoryData.ProductDetails.Quantity",
+                    MissingQuantity: { $subtract: ["$Quantity", "$billInventoryData.ProductDetails.Quantity"] }
+                }
+            }
+        ]);
+
+        return res.status(200).json({message:"get missaing quantity fior dispatch",data:result})
+    } catch (error) {
+        console.error("Error:", error);
+        return res.status(500).json({message:"Error in data base",Error:error})
+      
+    }
+};
+
