@@ -1,4 +1,5 @@
 const Billing = require('../Models/Billing');
+const BillInventory = require('../Models/BillInventory');
 
 function generateShortId() {
   const characters = '0123456789';
@@ -80,8 +81,7 @@ exports.updateBilling = async (req,res)=>{
     else{
        data.CheckStatus = "PENDING";
      }
-  }
- 
+  } 
      Billing.updateOne( { _id:req.body.id } , data).then(result=>{
          res.status(200).json({ message:"Document Update Successfully",data:result ,isSuccess:true })   
      })
@@ -191,5 +191,6 @@ exports.BillingCheckAmount = async (req, res) => {
       res.status(500).json({ error: 'An error occurred while calculating total check amount' });
   }
 };
+
 
 

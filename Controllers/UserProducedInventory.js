@@ -1,5 +1,6 @@
 const UserProducedInventory = require('../Models/UserProducedInventry');
 const BillingInventory = require('../Models/BillInventory');
+const Billing = require('../Models/Billing');
 const nodemailer = require('nodemailer');
 
 // User Create a Produced Inventory data
@@ -223,4 +224,61 @@ exports.DeleteDispatchForAdmin = (req,res)=>{
         })
   })
 }
+
+async function getStatusForBillInventories() {
+  try {
+    // Step 1: Retrieve all documents from the "BillInventory" collection
+    const billInventories = await BillingInventory.find();
+
+    // Step 2: Iterate through each document
+    for (const billInventory of billInventories) {
+      // Extract the bill number from the current bill inventory
+      const purchaseNo = billInventory.BillNo;
+
+      // Query the "Billing" collection to find a document with matching purchase number
+      const billingDocument = await Billing.findOne({ PurchaseNo: purchaseNo });
+      // console.log("billingDocument == ",billingDocument);
+      
+      // Step 3: If a matching document is found, extract the CheckStatus
+      if (billingDocument) {
+        // Add the status to the current document from the "BillInventory" collection
+        billInventory.status = billingDocument.CheckStatus;
+      } else {
+        // If no matching document is found, set the status to "PENDING"
+        billInventory.status = "PENDING";
+      }
+    }
+
+    // Return the modified documents from the "BillInventory" collection
+    return billInventories;
+  } catch (error) {
+    // Handle any errors
+    console.error("Error:", error);
+    throw error;
+  }
+}
+
+exports.GetDispatchAllDataHandler = async (req, res) => {
+  try {
+    // Fetch billing inventory documents with statuses
+    const billInventoriesWithStatus = await getStatusForBillInventories();
+    
+    // Add status field to each document
+    const result = billInventoriesWithStatus.map(bill => ({
+      ...bill.toObject(), // Convert Mongoose document to plain JavaScript object
+      status: bill.status // Include the status field
+    }));
+
+    // Send response
+    res.status(200).json({
+      message: "Get all dispatch documents",
+      data: result
+    });
+  } catch (error) {
+    // Handle any errors
+    console.error("Error:", error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
 
