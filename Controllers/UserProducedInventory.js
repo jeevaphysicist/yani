@@ -60,38 +60,6 @@ exports.GetUserProducedInventoryData = (req,res)=>{
 
  
 
-const SendEmail = (data)=>{
-  // console.log("data",data);
-
-    let mailOptions = {
-        from: process.env.email,
-        to: process.env.Toemail,
-        subject: `New Appointment from `,
-        html: `<h1>Contact Details</h1>
-        <div style="border: 2px solid #3498db; border-radius: 10px; padding: 20px; background-color: #f0f0f0; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);">
-            <p style="font-size: 18px; color: #333; margin: 0; padding-bottom: 10px;">Name: ${req.body.name}</p>
-            <p style="font-size: 18px; color: #333; margin: 0; padding-bottom: 10px;">Mobile no: ${req.body.phoneNumber}</p>
-            <p style="font-size: 18px; color: #333; margin: 0;">Time Slot: ${req.body.timeSlot}</p>
-        </div>`
-      };
-      let transporter = nodemailer.createTransport({
-        service: 'gmail',
-        auth: {
-          user: process.env.email,
-          pass: process.env.password
-        }
-      });
-
-      transporter.sendMail(mailOptions, function(error, info) {
-        // console.log("error",error);
-        if (error) {
-          return false
-        } 
-      }); 
-
-      // console.log("info",info) 
-    }
-
 
 // Update a Quantity
 exports.UpdateUserProducedInventoryData = async (req, res) => {
@@ -135,6 +103,7 @@ exports.UpdateUserProducedInventoryData = async (req, res) => {
      bill.ProductDetails.forEach((product) => {
        productRows += `
           <tr>
+            <th style="border: 1px solid #ccc; padding: 8px;">${bill.BillNo}</th>
             <th style="border: 1px solid #ccc; padding: 8px;">${product.ProductName}</th>
             <th style="border: 1px solid #ccc; padding: 8px;">${product.Quantity}</th>
             <th style="border: 1px solid #ccc; padding: 8px;">${product.QuantityType}</th>
@@ -149,14 +118,15 @@ exports.UpdateUserProducedInventoryData = async (req, res) => {
       html: `<h2 style="color: #333; font-size: 24px; margin-bottom: 20px;">Invoice Details</h2>
       <p style="margin-bottom: 10px;"><strong style="color: #555;">Client Name:</strong> ${bill.ClientDetails.ClientName}</p>
       <p style="margin-bottom: 10px;"><strong style="color: #555;">Client Address:</strong> ${bill.ClientDetails.ClientAddress}</p>
-      <p style="margin-bottom: 10px;"><strong style="color: #555;">Bill No:</strong> ${bill.BillNo}</p>
+      <p style="margin-bottom: 10px;"><strong style="color: #555;">Purchase Order Number:</strong> ${bill.BillNo}</p>
       <p style="margin-bottom: 10px;"><strong style="color: #555;">Billing Date:</strong> ${bill.BillingDate}</p>
       <h3 style="color: #333; font-size: 20px; margin-bottom: 15px;">Product Details</h3>
       <table style="width: 100%; border-collapse: collapse; border: 1px solid #ddd;">
         <thead>
           <tr style="background-color: #f2f2f2;">
-            <th style="border: 1px solid #ddd; padding: 12px;">Product Name</th>
-            <th style="border: 1px solid #ddd; padding: 12px;">Quantity</th>
+            <th style="border: 1px solid #ddd; padding: 12px;">Purchase No </th>
+            <th style="border: 1px solid #ddd; padding: 12px;">Product Name </th>
+            <th style="border: 1px solid #ddd; padding: 12px;">Quantity </th>
             <th style="border: 1px solid #ddd; padding: 12px;">Quantity Type</th>
           </tr>
         </thead>
